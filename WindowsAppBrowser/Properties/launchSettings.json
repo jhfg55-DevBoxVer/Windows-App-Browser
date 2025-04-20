@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WindowsAppBrowser (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WindowsAppBrowser (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
