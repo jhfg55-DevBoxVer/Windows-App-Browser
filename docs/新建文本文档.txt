@@ -1,2 +1,0 @@
-类名和方法名：使用帕斯卡命名法（PascalCase），例如 WindowsAppBrowser。
-变量名和参数名：使用驼峰命名法（camelCase），例如 windowsAppBrowser。
