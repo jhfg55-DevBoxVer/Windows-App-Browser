@@ -4,12 +4,43 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WindowsAppBrowser"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="WindowsAppBrowser">
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
-    </StackPanel>
+    <!-- Define overall layout -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Custom title bar area -->
+            <RowDefinition Height="Auto"/>
+            <!-- Address bar area -->
+            <RowDefinition Height="Auto"/>
+            <!-- Main content area -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Custom title bar area containing the TabView -->
+        <Grid x:Name="CustomTitleBar" Background="Transparent">
+            <muxc:TabView x:Name="MainTabView">
+                <muxc:TabView.TabItems>
+                    <!-- Default to wab:\blank blank page at startup -->
+                    <muxc:TabViewItem Header="wab://blank">
+                        <!-- Default blank page content can be defined here -->
+                        <Grid Background="White"/>
+                    </muxc:TabViewItem>
+                </muxc:TabView.TabItems>
+            </muxc:TabView>
+        </Grid>
+
+        <!-- Address bar area -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Background="LightGray" Padding="5">
+            <TextBox x:Name="AddressBar" Text="wab:\blank" Width="400" Margin="0,0,10,0" />
+            <Button Content="前往" Click="GoButton_Click"/>
+        </StackPanel>
+
+        <!-- Main content area for displaying tab-specific content -->
+        <Frame Grid.Row="2" x:Name="ContentFrame"/>
+    </Grid>
 </Window>
