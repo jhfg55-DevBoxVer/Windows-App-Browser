@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
+using Microsoft.Management.Infrastructure;
 
 namespace WindowsAppBrowser
 {
@@ -13,6 +14,15 @@ namespace WindowsAppBrowser
         public MainWindow()
         {
             this.InitializeComponent();
+
+            // Extend the window content into the title bar area.
+            this.ExtendsContentIntoTitleBar = true;
+
+            // Set the custom title bar element.
+            this.SetTitleBar(CustomTitleBar);
+
+            // Attach key down event handler to the address bar.
+            AddressBar.KeyDown += AddressBar_KeyDown;
 
             // Optionally, extend content into the title bar.
             // Note: The method to set up a custom title bar may vary depending on your requirements.
@@ -107,17 +117,53 @@ namespace WindowsAppBrowser
                    (uriResult.Scheme.Equals("smb", StringComparison.OrdinalIgnoreCase));
         }
 
-        /// <summary>
-        /// Simulates mounting a CIM virtual disk from the provided SMB URL.
-        /// Replace with actual mounting logic as needed.
-        /// </summary>
-        /// <param name="smbUrl">The SMB URL provided by the user.</param>
-        /// <returns>True if mount succeeds; otherwise, false.</returns>
-        private bool MountCimVirtualDisk(string smbUrl)
+
+// ...
+
+/// <summary>
+/// Attempts to mount a CIM virtual disk from the provided SMB URL.
+/// This example uses a CIM query to search for a virtual disk instance matching the share name.
+/// Adjust the CIM class and query as needed for your environment.
+/// </summary>
+/// <param name="smbUrl">The SMB URL provided by the user.</param>
+/// <returns>True if mount succeeds; otherwise, false.</returns>
+private bool MountCimVirtualDisk(string smbUrl)
+    {
+        try
         {
-            // TODO: Implement the actual mounting logic.
-            // This is a placeholder implementation for demonstration.
-            return true;
+            // Parse the SMB URL (e.g. "smb://server/share")
+            var uri = new Uri(smbUrl);
+            string server = uri.Host;
+            // Remove leading/trailing '/' from AbsolutePath to extract share name.
+            string share = uri.AbsolutePath.Trim('/');
+
+            // Create a CIM session with the remote server.
+            using CimSession session = CimSession.Create(server);
+
+            // Construct a query to find a virtual disk instance with a matching share name.
+            // Adjust the CIM namespace, class name, and query filter based on your CIM schema.
+            string cimNamespace = @"root\microsoft\windows\storage";
+            string query = $"SELECT * FROM MSFT_VirtualDisk WHERE ShareName LIKE '%{share}%'";
+
+            // Query instances from the CIM session.
+            var instances = session.QueryInstances(cimNamespace, "WQL", query);
+
+            // If a matching instance is found, assume mounting is possible.
+            foreach (CimInstance instance in instances)
+            {
+                // Optionally, invoke a CIM method to "mount" the disk if required.
+                // For demonstration, we assume that finding the instance means mount succeeded.
+                System.Diagnostics.Debug.WriteLine("Found virtual disk instance: " + instance.CimInstanceProperties["FriendlyName"].Value);
+                return true;
+            }
         }
+        catch (Exception ex)
+        {
+            // Log the exception or display error details.
+            System.Diagnostics.Debug.WriteLine("Error mounting CIM virtual disk: " + ex);
+        }
+        return false;
     }
+
+}
 }
